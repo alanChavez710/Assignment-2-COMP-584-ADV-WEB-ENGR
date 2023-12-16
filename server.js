@@ -1,76 +1,61 @@
 const express = require('express');
-const fs = require('fs'); // Require the file system module
+const mongoose = require('mongoose');
 const app = express();
-const port = 8086; // or any other available port
+const port = 8086;
+
+// Replace with your actual MongoDB connection string
+//const mongoDB = 'mongodb://localhost:27017/booksDatabase';
+const mongoDB = 'mongodb://127.0.0.1:27017/booksDatabase';
+mongoose.connect(mongoDB);
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
+// Define a schema for your book data
+const bookSchema = new mongoose.Schema({
+  title: String,
+  author: String,
+  publishedDate: Date
+});
+
+// Create a model from the schema
+const Book = mongoose.model('Book', bookSchema);
 
 app.use(express.json());
 
 // Set EJS as the templating engine
 app.set('view engine', 'ejs');
 
-app.get('/', (req, res) => {
-    const dataStorePath = './datastore.json'; // The path to the data store file
-
-    fs.readFile(dataStorePath, 'utf8', (err, data) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).render('error', { message: "Error loading the file data." });
-        }
-
-        // Parse the data from JSON format
-        const filesData = JSON.parse(data);
-
-        // Render the EJS template and pass the files data
-        res.render('index', { files: filesData });
-    });
+app.get('/', async (req, res) => {
+    try {
+        const books = await Book.find();
+        res.render('index', { files: books });
+    } catch (error) {
+        console.error(error);
+        res.status(500).render('error', { message: "Error loading the book data." });
+    }
 });
 
-
-// This route provides the stored data as an API response
-app.get('/api/file_tempo', (req, res) => {
-    const dataStorePath = './datastore.json'; // The path to the data store file
-
-    // Read the current data from the data store
-    fs.readFile(dataStorePath, 'utf8', (err, data) => {
-        if (err) {
-            // If there's an error reading the file, send a server error response
-            console.error(err);
-            return res.status(500).json({ message: "Error fetching data" });
-        }
-
-        // If the file is read successfully, send the data as a response
-        res.json(JSON.parse(data));
-    });
+app.get('/api/file_tempo', async (req, res) => {
+    try {
+        const books = await Book.find();
+        res.json(books);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error fetching data from the database" });
+    }
 });
 
-// This route simulates adding new data and storing it
-app.post('/api/file_tempo/add', (req, res) => {
-    const newData = req.body;
-
-    // Read the current data and then append the new data
-    fs.readFile(dataStorePath, 'utf8', (err, data) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: "Error reading data for update" });
-        }
-
-        // Parse the existing data and add the new data
-        const currentData = JSON.parse(data);
-        currentData.push(newData);
-
-        // Write the updated data back to the file
-        fs.writeFile(dataStorePath, JSON.stringify(currentData, null, 2), (err) => {
-            if (err) {
-                console.error(err);
-                return res.status(500).json({ message: "Error writing updated data" });
-            }
-
-            // Send a success response
-            res.json({ message: "Data added successfully" });
-        });
-    });
+app.post('/api/file_tempo/add', async (req, res) => {
+    try {
+        const newBook = new Book(req.body); // Create a new book with the request body
+        const savedBook = await newBook.save(); // Save the book
+        res.json({ message: "Data added successfully", book: savedBook });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error saving data to the database" });
+    }
 });
-  
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
