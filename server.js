@@ -8,20 +8,8 @@ app.use(express.json());
 // Set EJS as the templating engine
 app.set('view engine', 'ejs');
 
-// app.get('/', (req, res) => {
-//     // Example data
-//     const filesData = [
-//       { name: 'file1.txt', size: '2KB', date: '2021-01-01' },
-//       { name: 'report.pdf', size: '5MB', date: '2021-02-01' },
-//       // Add more file data here
-//     ];
-  
-//     // Render the EJS template and pass the files data
-//     res.render('index', { files: filesData });
-//   });
-
 app.get('/', (req, res) => {
-    const dataStorePath = './datastore.json'; // The path to your data store file
+    const dataStorePath = './datastore.json'; // The path to the data store file
 
     fs.readFile(dataStorePath, 'utf8', (err, data) => {
         if (err) {
@@ -40,7 +28,7 @@ app.get('/', (req, res) => {
 
 // This route provides the stored data as an API response
 app.get('/api/file_tempo', (req, res) => {
-    const dataStorePath = './datastore.json'; // The path to your data store file
+    const dataStorePath = './datastore.json'; // The path to the data store file
 
     // Read the current data from the data store
     fs.readFile(dataStorePath, 'utf8', (err, data) => {
@@ -57,7 +45,7 @@ app.get('/api/file_tempo', (req, res) => {
 
 // This route simulates adding new data and storing it
 app.post('/api/file_tempo/add', (req, res) => {
-    const newData = req.body; // This would be the new data you want to add
+    const newData = req.body;
 
     // Read the current data and then append the new data
     fs.readFile(dataStorePath, 'utf8', (err, data) => {
