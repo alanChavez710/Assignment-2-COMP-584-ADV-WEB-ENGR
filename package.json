@@ -1,0 +1,18 @@
+{
+  "name": "assignment_2_fall2023",
+  "version": "1.0.0",
+  "description": "```\r {\r     \"filename\": \"641693__theflyfishingfilmmaker__bluesy-violin-repeating-lick.wav\",\r     \"overall_tempo\": 97.09181213378906,\r     \"peak_1\": 98.0,\r     \"peak_2\": 92.0\r }\r ```\r ![alt text](https://github.com/marvinh-csun/assignment_2_Fall2023/blob/main/postman%20example.png)\r ## Part 2",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.2",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "sheetjs": "^2.0.0"
+  }
+}
